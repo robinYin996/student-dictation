@@ -37,6 +37,14 @@ const DictationPlayer: React.FC<Props> = ({ type, items, onBack }) => {
   // 当前播放的项目（使用打乱后的列表）
   const currentItem = shuffledItems[currentIndex]
 
+  // 获取要播放的文本（英文单词播放中文翻译，其他类型播放内容）
+  const getTextToSpeak = (item: VocabularyItem): string => {
+    if (type === 'english' && item.translation) {
+      return item.translation
+    }
+    return item.content
+  }
+
   // 文字转语音功能
   const speakText = (text: string, shouldWaitForCommand: boolean = true) => {
     if ('speechSynthesis' in window) {
@@ -103,10 +111,10 @@ const DictationPlayer: React.FC<Props> = ({ type, items, onBack }) => {
       setTimeout(() => {
         if (settings.autoPlay) {
           // 自动播放模式，播放后继续下一个
-          speakText(shuffledItems[currentIndex + 1].content, false)
+          speakText(getTextToSpeak(shuffledItems[currentIndex + 1]), false)
         } else {
           // 监听模式，播放后等待指令
-          speakText(shuffledItems[currentIndex + 1].content, true)
+          speakText(getTextToSpeak(shuffledItems[currentIndex + 1]), true)
         }
       }, 800)
     } else {
@@ -128,10 +136,10 @@ const DictationPlayer: React.FC<Props> = ({ type, items, onBack }) => {
       setWaitingForCommand(false)
       if (settings.autoPlay) {
         // 自动播放模式，重复后继续
-        speakText(currentItem.content, false)
+        speakText(getTextToSpeak(currentItem), false)
       } else {
         // 监听模式，重复后等待指令
-        speakText(currentItem.content, true)
+        speakText(getTextToSpeak(currentItem), true)
       }
     }
   }
@@ -156,7 +164,7 @@ const DictationPlayer: React.FC<Props> = ({ type, items, onBack }) => {
       startListening()
       // 监听模式下直接播放第一个
       setTimeout(() => {
-        speakText(shuffled[0].content, true)
+        speakText(getTextToSpeak(shuffled[0]), true)
       }, 1000)
     }
   }
@@ -166,7 +174,7 @@ const DictationPlayer: React.FC<Props> = ({ type, items, onBack }) => {
     if (isPaused) {
       setIsPaused(false)
       if (isPlaying && currentItem) {
-        speakText(currentItem.content, false) // 暂停后继续播放不等待指令
+        speakText(getTextToSpeak(currentItem), false) // 暂停后继续播放不等待指令
       }
     } else {
       setIsPaused(true)
@@ -244,7 +252,7 @@ const DictationPlayer: React.FC<Props> = ({ type, items, onBack }) => {
       console.log(`首次播放 "${currentItem.content}"`);
       const timer = setTimeout(() => {
         setCurrentPlayCount(0);
-        speakText(currentItem.content, false);
+        speakText(getTextToSpeak(currentItem), false);
       }, 1000);
       return () => clearTimeout(timer);
     }
@@ -253,7 +261,7 @@ const DictationPlayer: React.FC<Props> = ({ type, items, onBack }) => {
       // 重复播放当前单词（固定间隔 2 秒）
       console.log(`重复播放 "${currentItem.content}" (第${currentPlayCount + 1}次)`);
       const timer = setTimeout(() => {
-        speakText(currentItem.content, false);
+        speakText(getTextToSpeak(currentItem), false);
         // 注意：不在这里增加 currentPlayCount，由 speakText 的 onend 回调处理
       }, 2000); // 同一单词重复间隔固定 2 秒
       
@@ -286,7 +294,7 @@ const DictationPlayer: React.FC<Props> = ({ type, items, onBack }) => {
       if (currentPlayCount < settings.repeatCount) {
         console.log('监听模式下自动重复播放');
         const repeatTimer = setTimeout(() => {
-          speakText(currentItem.content, true); // 重复播放后继续等待指令
+          speakText(getTextToSpeak(currentItem), true); // 重复播放后继续等待指令
         }, 2000);
         return () => clearTimeout(repeatTimer);
       }
