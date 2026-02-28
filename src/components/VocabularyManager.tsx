@@ -13,6 +13,7 @@ const VocabularyManager: React.FC<Props> = ({ onStartDictation }) => {
   const [selectedItems, setSelectedItems] = useState<string[]>([])
   const [showAddForm, setShowAddForm] = useState(false)
   const [bulkImportText, setBulkImportText] = useState('')
+  const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({
     content: '',
     pronunciation: '',
@@ -23,15 +24,22 @@ const VocabularyManager: React.FC<Props> = ({ onStartDictation }) => {
     loadItems()
   }, [selectedType])
 
-  const loadItems = () => {
-    const typeItems = vocabularyStorage.getByType(selectedType)
-    setItems(typeItems)
+  const loadItems = async () => {
+    setLoading(true)
+    try {
+      const typeItems = await vocabularyStorage.getByType(selectedType)
+      setItems(typeItems)
+    } catch (error) {
+      console.error('加载数据失败:', error)
+    } finally {
+      setLoading(false)
+    }
   }
 
-  const handleAddItem = () => {
+  const handleAddItem = async () => {
     if (!formData.content.trim()) return
 
-    vocabularyStorage.add({
+    await vocabularyStorage.add({
       type: selectedType,
       content: formData.content.trim(),
       pronunciation: formData.pronunciation.trim() || undefined,
@@ -40,10 +48,10 @@ const VocabularyManager: React.FC<Props> = ({ onStartDictation }) => {
 
     setFormData({ content: '', pronunciation: '', translation: '' })
     setShowAddForm(false)
-    loadItems()
+    await loadItems()
   }
 
-  const handleBulkImport = () => {
+  const handleBulkImport = async () => {
     if (!bulkImportText.trim()) return
 
     try {
@@ -70,26 +78,26 @@ const VocabularyManager: React.FC<Props> = ({ onStartDictation }) => {
         }
       })
 
-      vocabularyStorage.addBatch(newItems)
+      await vocabularyStorage.addBatch(newItems)
       setBulkImportText('')
-      loadItems()
+      await loadItems()
     } catch (error) {
       alert('批量导入格式错误，请检查输入格式')
     }
   }
 
-  const handleDeleteSelected = () => {
+  const handleDeleteSelected = async () => {
     if (selectedItems.length === 0) return
     
     if (confirm(`确定要删除选中的 ${selectedItems.length} 个项目吗？`)) {
-      vocabularyStorage.deleteBatch(selectedItems)
+      await vocabularyStorage.deleteBatch(selectedItems)
       setSelectedItems([])
-      loadItems()
+      await loadItems()
     }
   }
 
-  const handleExport = () => {
-    const allItems = vocabularyStorage.getAll()
+  const handleExport = async () => {
+    const allItems = await vocabularyStorage.getAll()
     exportToCSV(allItems, `词库导出_${new Date().toISOString().split('T')[0]}`)
   }
 
@@ -292,7 +300,11 @@ orange|/ˈɒrɪndʒ/|橙子`
         </div>
         
         <div className="divide-y divide-gray-200">
-          {items.length === 0 ? (
+          {loading ? (
+            <div className="p-8 text-center text-gray-500">
+              加载中...
+            </div>
+          ) : items.length === 0 ? (
             <div className="p-8 text-center text-gray-500">
               暂无数据，请添加项目
             </div>

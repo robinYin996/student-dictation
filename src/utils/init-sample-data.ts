@@ -1,15 +1,15 @@
 import { vocabularyStorage } from '../services/storage'
 import sampleData from '../data/sample-data'
 
-export const initializeSampleData = () => {
+export const initializeSampleData = async () => {
   // 检查是否已有数据
-  const existingData = vocabularyStorage.getAll()
+  const existingData = await vocabularyStorage.getAll()
   
   if (existingData.length === 0) {
     console.log('正在初始化示例数据...')
     
     // 添加示例数据
-    vocabularyStorage.addBatch(sampleData)
+    await vocabularyStorage.addBatch(sampleData)
     
     console.log('✅ 示例数据初始化完成！')
     console.log('📊 已添加:')

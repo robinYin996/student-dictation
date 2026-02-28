@@ -1,0 +1,241 @@
+[
+  {
+    "type": "english",
+    "content": "apple",
+    "pronunciation": "/ˈæpəl/",
+    "translation": "苹果",
+    "id": "lqoeqe4cv",
+    "createdAt": "2026-02-28T06:09:38.016Z"
+  },
+  {
+    "type": "english",
+    "content": "banana",
+    "pronunciation": "/bəˈnænə/",
+    "translation": "香蕉",
+    "id": "evgregz8p",
+    "createdAt": "2026-02-28T06:09:38.016Z"
+  },
+  {
+    "type": "english",
+    "content": "computer",
+    "pronunciation": "/kəmˈpjuːtər/",
+    "translation": "计算机",
+    "id": "bpolim9b4",
+    "createdAt": "2026-02-28T06:09:38.016Z"
+  },
+  {
+    "type": "english",
+    "content": "beautiful",
+    "pronunciation": "/ˈbjuːtɪfl/",
+    "translation": "美丽的",
+    "id": "qh7a9ylt0",
+    "createdAt": "2026-02-28T06:09:38.016Z"
+  },
+  {
+    "type": "english",
+    "content": "education",
+    "pronunciation": "/ˌedʒuˈkeɪʃn/",
+    "translation": "教育",
+    "id": "kjmboydxp",
+    "createdAt": "2026-02-28T06:09:38.016Z"
+  },
+  {
+    "type": "poetry",
+    "content": "春眠不觉晓，处处闻啼鸟。",
+    "pronunciation": "chūn mián bù jué xiǎo, chù chù wén tí niǎo.",
+    "translation": "春天睡醒不觉天已大亮，到处是鸟儿清脆的叫声。",
+    "id": "m4le7loxl",
+    "createdAt": "2026-02-28T06:09:38.016Z"
+  },
+  {
+    "type": "poetry",
+    "content": "床前明月光，疑是地上霜。",
+    "pronunciation": "chuáng qián míng yuè guāng, yí shì dì shàng shuāng.",
+    "translation": "床前洒满了明亮的月光，怀疑是地上铺了一层白霜。",
+    "id": "6yl4lw5eq",
+    "createdAt": "2026-02-28T06:09:38.016Z"
+  },
+  {
+    "type": "poetry",
+    "content": "锄禾日当午，汗滴禾下土。",
+    "pronunciation": "chú hé rì dāng wǔ, hàn dī hé xià tǔ.",
+    "translation": "农民在正午烈日下锄禾，汗水滴入禾下的泥土中。",
+    "id": "1lwoh2gie",
+    "createdAt": "2026-02-28T06:09:38.016Z"
+  },
+  {
+    "type": "poetry",
+    "content": "白日依山尽，黄河入海流。",
+    "pronunciation": "bái rì yī shān jìn, huáng hé rù hǎi liú.",
+    "translation": "夕阳依傍着西山慢慢地沉没，滔滔黄河朝着东海汹涌奔流。",
+    "id": "73wvskdp9",
+    "createdAt": "2026-02-28T06:09:38.016Z"
+  },
+  {
+    "type": "poetry",
+    "content": "举头望明月，低头思故乡。",
+    "pronunciation": "jǔ tóu wàng míng yuè, dī tóu sī gù xiāng.",
+    "translation": "我抬起头来，看那天窗外空中的明月，不由得低头沉思，想起远方的家乡。",
+    "id": "onn86uxr3",
+    "createdAt": "2026-02-28T06:09:38.016Z"
+  },
+  {
+    "type": "chinese",
+    "content": "阳光",
+    "pronunciation": "yáng guāng",
+    "translation": "太阳发出的光",
+    "id": "55qxmr409",
+    "createdAt": "2026-02-28T06:09:38.016Z"
+  },
+  {
+    "type": "chinese",
+    "content": "快乐",
+    "pronunciation": "kuài lè",
+    "translation": "心情愉悦，感到幸福",
+    "id": "yxiduafaj",
+    "createdAt": "2026-02-28T06:09:38.016Z"
+  },
+  {
+    "type": "chinese",
+    "content": "学习",
+    "pronunciation": "xué xí",
+    "translation": "通过练习、训练获得知识技能",
+    "id": "mxshqthsu",
+    "createdAt": "2026-02-28T06:09:38.016Z"
+  },
+  {
+    "type": "chinese",
+    "content": "友谊",
+    "pronunciation": "yǒu yì",
+    "translation": "朋友间的情谊",
+    "id": "otc5eptch",
+    "createdAt": "2026-02-28T06:09:38.016Z"
+  },
+  {
+    "type": "chinese",
+    "content": "梦想",
+    "pronunciation": "mèng xiǎng",
+    "translation": "对未来美好生活的愿望",
+    "id": "7mowjlka6",
+    "createdAt": "2026-02-28T06:09:38.016Z"
+  },
+  {
+    "type": "english",
+    "content": "grape",
+    "translation": "葡萄",
+    "id": "vqwunxh8r",
+    "createdAt": "2026-02-28T06:14:48.894Z"
+  },
+  {
+    "type": "english",
+    "content": "watermelon",
+    "translation": "西瓜",
+    "id": "0106cfdlv",
+    "createdAt": "2026-02-28T06:14:48.894Z"
+  },
+  {
+    "type": "english",
+    "content": "strawberry",
+    "translation": "草莓",
+    "id": "xpomif8is",
+    "createdAt": "2026-02-28T06:14:48.894Z"
+  },
+  {
+    "type": "english",
+    "content": "pineapple",
+    "translation": "菠萝",
+    "id": "1ovelu5ye",
+    "createdAt": "2026-02-28T06:14:48.894Z"
+  },
+  {
+    "type": "english",
+    "content": "peach",
+    "translation": "桃子",
+    "id": "w1fwnv0f2",
+    "createdAt": "2026-02-28T06:14:48.894Z"
+  },
+  {
+    "type": "english",
+    "content": "pear",
+    "translation": "梨",
+    "id": "deba3c956",
+    "createdAt": "2026-02-28T06:14:48.894Z"
+  },
+  {
+    "type": "english",
+    "content": "lemon",
+    "translation": "柠檬",
+    "id": "ers1oh64v",
+    "createdAt": "2026-02-28T06:14:48.894Z"
+  },
+  {
+    "type": "english",
+    "content": "cat",
+    "translation": "猫",
+    "id": "qj0401gf8",
+    "createdAt": "2026-02-28T06:14:48.894Z"
+  },
+  {
+    "type": "english",
+    "content": "dog",
+    "translation": "狗",
+    "id": "dsih5zmp4",
+    "createdAt": "2026-02-28T06:14:48.894Z"
+  },
+  {
+    "type": "english",
+    "content": "rabbit",
+    "translation": "兔子",
+    "id": "efn24in5l",
+    "createdAt": "2026-02-28T06:14:48.894Z"
+  },
+  {
+    "type": "english",
+    "content": "elephant",
+    "translation": "大象",
+    "id": "t4o2944i1",
+    "createdAt": "2026-02-28T06:14:48.894Z"
+  },
+  {
+    "type": "english",
+    "content": "tiger",
+    "translation": "老虎",
+    "id": "pzg314rc6",
+    "createdAt": "2026-02-28T06:14:48.894Z"
+  },
+  {
+    "type": "english",
+    "content": "lion",
+    "translation": "狮子",
+    "id": "nktnidv7t",
+    "createdAt": "2026-02-28T06:14:48.894Z"
+  },
+  {
+    "type": "english",
+    "content": "monkey",
+    "translation": "猴子",
+    "id": "gcbmi1spw",
+    "createdAt": "2026-02-28T06:14:48.894Z"
+  },
+  {
+    "type": "english",
+    "content": "panda",
+    "translation": "熊猫",
+    "id": "h8hta82a0",
+    "createdAt": "2026-02-28T06:14:48.894Z"
+  },
+  {
+    "type": "english",
+    "content": "bird",
+    "translation": "鸟",
+    "id": "o10wws8y5",
+    "createdAt": "2026-02-28T06:14:48.894Z"
+  },
+  {
+    "type": "english",
+    "content": "fish",
+    "translation": "鱼",
+    "id": "319wiceku",
+    "createdAt": "2026-02-28T06:14:48.894Z"
+  }
+]
