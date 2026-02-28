@@ -14,12 +14,14 @@ const DictationPlayer: React.FC<Props> = ({ type, items, onBack }) => {
   const [settings, setSettings] = useState<DictationSettings>({
     interval: 3,
     repeatCount: 2,
-    autoPlay: false // 默认关闭自动播放
+    autoPlay: false, // 默认关闭自动播放
+    autoRepeatInListenMode: false // 默认关闭监听模式自动重复
   })
   const [isPaused, setIsPaused] = useState(false)
   const [waitingForCommand, setWaitingForCommand] = useState(false)
+  const [currentPlayCount, setCurrentPlayCount] = useState(0) // 当前单词已播放次数
   
-  const { isListening, transcript, startListening, stopListening, resetTranscript } = useVoiceRecognition()
+  const { isListening, transcript, startListening, stopListening, resetTranscript, restartListening } = useVoiceRecognition()
 
   // 当前播放的项目
   const currentItem = items[currentIndex]
@@ -56,7 +58,15 @@ const DictationPlayer: React.FC<Props> = ({ type, items, onBack }) => {
       
       // 播放完成后的回调
       utterance.onend = () => {
-        console.log('语音播放完成')
+        console.log('语音播放完成:', text)
+        console.log('当前播放次数:', currentPlayCount)
+        console.log('是否等待指令:', shouldWaitForCommand)
+        // 更新播放次数
+        setCurrentPlayCount(prev => {
+          const newCount = prev + 1
+          console.log('更新播放次数到:', newCount)
+          return newCount
+        })
         // 只有当shouldWaitForCommand为true时才设置等待状态
         if (shouldWaitForCommand) {
           setWaitingForCommand(true)
@@ -77,14 +87,25 @@ const DictationPlayer: React.FC<Props> = ({ type, items, onBack }) => {
     if (currentIndex < items.length - 1) {
       setCurrentIndex(prev => prev + 1)
       setWaitingForCommand(false)
+      setCurrentPlayCount(0) // 重置播放次数
       // 延迟播放，让用户有准备时间
       setTimeout(() => {
-        speakText(items[currentIndex + 1].content, true) // 播放完成后等待指令
+        if (settings.autoPlay) {
+          // 自动播放模式，播放后继续下一个
+          speakText(items[currentIndex + 1].content, false)
+        } else {
+          // 监听模式，播放后等待指令
+          speakText(items[currentIndex + 1].content, true)
+        }
       }, 800)
     } else {
       // 默写完成
       setIsPlaying(false)
       setWaitingForCommand(false)
+      setCurrentPlayCount(0)
+      if (!settings.autoPlay) {
+        stopListening() // 停止语音监听
+      }
       alert('🎉 默写完成！')
     }
   }
@@ -94,7 +115,13 @@ const DictationPlayer: React.FC<Props> = ({ type, items, onBack }) => {
     console.log('重复播放当前项目')
     if (currentItem) {
       setWaitingForCommand(false)
-      speakText(currentItem.content, true) // 重复播放后也等待指令
+      if (settings.autoPlay) {
+        // 自动播放模式，重复后继续
+        speakText(currentItem.content, false)
+      } else {
+        // 监听模式，重复后等待指令
+        speakText(currentItem.content, true)
+      }
     }
   }
 
@@ -106,14 +133,17 @@ const DictationPlayer: React.FC<Props> = ({ type, items, onBack }) => {
     setIsPlaying(true)
     setCurrentIndex(0)
     setWaitingForCommand(false)
+    setCurrentPlayCount(-1) // 设置为 -1，让 useEffect 触发首次播放
     
-    // 开始语音识别
-    startListening()
-    
-    // 播放第一个项目
-    setTimeout(() => {
-      speakText(items[0].content, true) // 第一次播放后也要等待指令
-    }, 1000)
+    // 根据自动播放设置决定是否启动语音识别
+    if (!settings.autoPlay) {
+      // 非自动播放模式，启动语音监听
+      startListening()
+      // 监听模式下直接播放第一个
+      setTimeout(() => {
+        speakText(items[0].content, true)
+      }, 1000)
+    }
   }
 
   // 暂停/继续
@@ -170,6 +200,83 @@ const DictationPlayer: React.FC<Props> = ({ type, items, onBack }) => {
       }
     }
   }, [transcript, isPlaying, isPaused, waitingForCommand])
+
+  // 改进的自动播放逻辑
+  useEffect(() => {
+    if (!isPlaying || isPaused || !settings.autoPlay) {
+      return;
+    }
+
+    console.log('自动播放激活:', { 
+      currentIndex, 
+      currentPlayCount, 
+      repeatCount: settings.repeatCount,
+      isLastItem: currentIndex === items.length - 1,
+      itemsLength: items.length
+    });
+
+    // 检查是否已完成所有播放
+    if (currentIndex >= items.length) {
+      console.log('所有单词播放完成');
+      setIsPlaying(false);
+      return;
+    }
+
+    const currentItem = items[currentIndex];
+    
+    // currentPlayCount = -1 表示首次播放，需要初始化
+    if (currentPlayCount === -1) {
+      console.log(`首次播放 "${currentItem.content}"`);
+      const timer = setTimeout(() => {
+        setCurrentPlayCount(0);
+        speakText(currentItem.content, false);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+    
+    if (currentPlayCount < settings.repeatCount) {
+      // 重复播放当前单词（固定间隔 2 秒）
+      console.log(`重复播放 "${currentItem.content}" (第${currentPlayCount + 1}次)`);
+      const timer = setTimeout(() => {
+        speakText(currentItem.content, false);
+        // 注意：不在这里增加 currentPlayCount，由 speakText 的 onend 回调处理
+      }, 2000); // 同一单词重复间隔固定 2 秒
+      
+      return () => clearTimeout(timer);
+    } else {
+      // 当前单词播放完成
+      console.log(`"${currentItem.content}" 播放完成`);
+      
+      if (currentIndex === items.length - 1) {
+        // 最后一个单词，结束播放
+        console.log('最后一个单词播放完成，结束自动播放');
+        setIsPlaying(false);
+      } else {
+        // 播放下一个单词
+        console.log('准备播放下一个单词');
+        const timer = setTimeout(() => {
+          setCurrentIndex(prev => prev + 1);
+          setCurrentPlayCount(-1); // 设置为 -1 触发下一个单词的首次播放
+        }, settings.interval * 1000);
+        
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [isPlaying, isPaused, settings.autoPlay, currentIndex, currentPlayCount, items, settings.repeatCount, settings.interval]);
+
+  // 监听模式下的自动重复逻辑
+  useEffect(() => {
+    if (isPlaying && !isPaused && !settings.autoPlay && settings.autoRepeatInListenMode && waitingForCommand) {
+      // 检查是否需要自动重复当前单词
+      if (currentPlayCount < settings.repeatCount) {
+        console.log('监听模式下自动重复播放');
+        const repeatTimer = setTimeout(() => {
+          speakText(currentItem.content, true); // 重复播放后继续等待指令
+        }, 2000);
+        return () => clearTimeout(repeatTimer);
+      }
+    }
+  }, [isPlaying, isPaused, settings.autoPlay, settings.autoRepeatInListenMode, waitingForCommand, currentPlayCount, settings.repeatCount, currentItem]);
 
   const getTypeLabel = (type: DictationType) => {
     switch (type) {
@@ -237,7 +344,7 @@ const DictationPlayer: React.FC<Props> = ({ type, items, onBack }) => {
         </div>
 
         {/* 设置面板 */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-gray-50 rounded-lg">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 bg-gray-50 rounded-lg">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               播放间隔 (秒)
@@ -278,6 +385,19 @@ const DictationPlayer: React.FC<Props> = ({ type, items, onBack }) => {
                 disabled={isPlaying}
               />
               <span className="text-sm font-medium text-gray-700">自动播放</span>
+            </label>
+          </div>
+          
+          <div className="flex items-end">
+            <label className="flex items-center">
+              <input
+                type="checkbox"
+                checked={settings.autoRepeatInListenMode}
+                onChange={(e) => setSettings({...settings, autoRepeatInListenMode: e.target.checked})}
+                className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                disabled={isPlaying}
+              />
+              <span className="text-sm font-medium text-gray-700">监听模式重复</span>
             </label>
           </div>
         </div>
