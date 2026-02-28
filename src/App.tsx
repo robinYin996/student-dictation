@@ -26,7 +26,7 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-200">
       <header className="bg-white shadow-sm border-b">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
@@ -34,7 +34,7 @@ function App() {
             {currentView === 'dictation' && (
               <button
                 onClick={handleBackToManager}
-                className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+                className="px-4 py-2 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-lg transition-colors"
               >
                 ← 返回词库管理
               </button>

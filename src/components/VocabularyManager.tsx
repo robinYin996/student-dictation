@@ -154,8 +154,8 @@ const VocabularyManager: React.FC<Props> = ({ onStartDictation }) => {
               onClick={() => setSelectedType(type)}
               className={`px-4 py-2 rounded-lg transition-colors ${
                 selectedType === type
-                  ? 'bg-blue-500 text-white'
-                  : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+                  ? 'bg-blue-700 text-white'
+                  : 'bg-blue-500 hover:bg-blue-600 text-white'
               }`}
             >
               {getTypeLabel(type)}
@@ -173,20 +173,20 @@ const VocabularyManager: React.FC<Props> = ({ onStartDictation }) => {
           </button>
           <button
             onClick={handleSelectAll}
-            className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
+            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
           >
             {selectedItems.length === items.length ? '取消全选' : '全选'}
           </button>
           <button
             onClick={handleDeleteSelected}
             disabled={selectedItems.length === 0}
-            className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 disabled:bg-gray-300 transition-colors"
+            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:bg-blue-300 disabled:cursor-not-allowed transition-colors"
           >
             删除选中
           </button>
           <button
             onClick={handleExport}
-            className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
+            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
           >
             导出词库
           </button>
@@ -247,7 +247,7 @@ const VocabularyManager: React.FC<Props> = ({ onStartDictation }) => {
               </button>
               <button
                 onClick={() => setShowAddForm(false)}
-                className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors"
+                className="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors"
               >
                 取消
               </button>
@@ -285,7 +285,7 @@ orange|/ˈɒrɪndʒ/|橙子`
         </div>
         <button
           onClick={handleBulkImport}
-          className="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors"
+          className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-medium"
         >
           批量导入
         </button>
@@ -337,9 +337,9 @@ orange|/ˈɒrɪndʒ/|橙子`
         <button
           onClick={handleStartDictation}
           disabled={items.length === 0}
-          className="px-6 py-3 bg-green-500 text-white rounded-full shadow-lg hover:bg-green-600 disabled:bg-gray-300 transition-all transform hover:scale-105"
+          className="px-6 py-3 bg-blue-500 text-white rounded-full shadow-lg hover:bg-blue-600 disabled:bg-blue-300 transition-all transform hover:scale-105"
         >
-          🎯 开始默写 ({selectedItems.length > 0 ? selectedItems.length : items.length}项)
+          开始默写 ({selectedItems.length > 0 ? selectedItems.length : items.length}项)
         </button>
       </div>
     </div>
