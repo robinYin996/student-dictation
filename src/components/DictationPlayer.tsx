@@ -11,6 +11,7 @@ interface Props {
 const DictationPlayer: React.FC<Props> = ({ type, items, onBack }) => {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isPlaying, setIsPlaying] = useState(false)
+  const [shuffledItems, setShuffledItems] = useState<VocabularyItem[]>([]) // 随机打乱后的播放列表
   const [settings, setSettings] = useState<DictationSettings>({
     interval: 3,
     repeatCount: 2,
@@ -23,8 +24,18 @@ const DictationPlayer: React.FC<Props> = ({ type, items, onBack }) => {
   
   const { isListening, transcript, startListening, stopListening, resetTranscript, restartListening } = useVoiceRecognition()
 
-  // 当前播放的项目
-  const currentItem = items[currentIndex]
+  // Fisher-Yates 洗牌算法
+  const shuffleArray = <T,>(array: T[]): T[] => {
+    const shuffled = [...array]
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1))
+      ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+    }
+    return shuffled
+  }
+
+  // 当前播放的项目（使用打乱后的列表）
+  const currentItem = shuffledItems[currentIndex]
 
   // 文字转语音功能
   const speakText = (text: string, shouldWaitForCommand: boolean = true) => {
@@ -84,7 +95,7 @@ const DictationPlayer: React.FC<Props> = ({ type, items, onBack }) => {
   // 播放下一个项目
   const playNext = () => {
     console.log('播放下一个项目')
-    if (currentIndex < items.length - 1) {
+    if (currentIndex < shuffledItems.length - 1) {
       setCurrentIndex(prev => prev + 1)
       setWaitingForCommand(false)
       setCurrentPlayCount(0) // 重置播放次数
@@ -92,10 +103,10 @@ const DictationPlayer: React.FC<Props> = ({ type, items, onBack }) => {
       setTimeout(() => {
         if (settings.autoPlay) {
           // 自动播放模式，播放后继续下一个
-          speakText(items[currentIndex + 1].content, false)
+          speakText(shuffledItems[currentIndex + 1].content, false)
         } else {
           // 监听模式，播放后等待指令
-          speakText(items[currentIndex + 1].content, true)
+          speakText(shuffledItems[currentIndex + 1].content, true)
         }
       }, 800)
     } else {
@@ -130,6 +141,10 @@ const DictationPlayer: React.FC<Props> = ({ type, items, onBack }) => {
     if (items.length === 0) return
     
     console.log('开始默写')
+    // 随机打乱播放顺序
+    const shuffled = shuffleArray(items)
+    setShuffledItems(shuffled)
+    
     setIsPlaying(true)
     setCurrentIndex(0)
     setWaitingForCommand(false)
@@ -141,7 +156,7 @@ const DictationPlayer: React.FC<Props> = ({ type, items, onBack }) => {
       startListening()
       // 监听模式下直接播放第一个
       setTimeout(() => {
-        speakText(items[0].content, true)
+        speakText(shuffled[0].content, true)
       }, 1000)
     }
   }
@@ -211,18 +226,18 @@ const DictationPlayer: React.FC<Props> = ({ type, items, onBack }) => {
       currentIndex, 
       currentPlayCount, 
       repeatCount: settings.repeatCount,
-      isLastItem: currentIndex === items.length - 1,
-      itemsLength: items.length
+      isLastItem: currentIndex === shuffledItems.length - 1,
+      itemsLength: shuffledItems.length
     });
 
     // 检查是否已完成所有播放
-    if (currentIndex >= items.length) {
+    if (currentIndex >= shuffledItems.length) {
       console.log('所有单词播放完成');
       setIsPlaying(false);
       return;
     }
 
-    const currentItem = items[currentIndex];
+    const currentItem = shuffledItems[currentIndex];
     
     // currentPlayCount = -1 表示首次播放，需要初始化
     if (currentPlayCount === -1) {
@@ -247,7 +262,7 @@ const DictationPlayer: React.FC<Props> = ({ type, items, onBack }) => {
       // 当前单词播放完成
       console.log(`"${currentItem.content}" 播放完成`);
       
-      if (currentIndex === items.length - 1) {
+      if (currentIndex === shuffledItems.length - 1) {
         // 最后一个单词，结束播放
         console.log('最后一个单词播放完成，结束自动播放');
         setIsPlaying(false);
@@ -262,7 +277,7 @@ const DictationPlayer: React.FC<Props> = ({ type, items, onBack }) => {
         return () => clearTimeout(timer);
       }
     }
-  }, [isPlaying, isPaused, settings.autoPlay, currentIndex, currentPlayCount, items, settings.repeatCount, settings.interval]);
+  }, [isPlaying, isPaused, settings.autoPlay, currentIndex, currentPlayCount, shuffledItems, settings.repeatCount, settings.interval]);
 
   // 监听模式下的自动重复逻辑
   useEffect(() => {
