@@ -26,6 +26,17 @@ export const vocabularyStorage = {
     return allItems.filter(item => item.type === type)
   },
 
+  getByTypeAndUnit: async (type: DictationType, unit: string): Promise<VocabularyItem[]> => {
+    const allItems = await vocabularyStorage.getAll()
+    return allItems.filter(item => item.type === type && item.unit === unit)
+  },
+
+  getUnitsByType: async (type: DictationType): Promise<string[]> => {
+    const allItems = await vocabularyStorage.getAll()
+    const units = new Set(allItems.filter(item => item.type === type).map(item => item.unit || ''))
+    return Array.from(units).filter(u => u).sort()
+  },
+
   add: async (item: Omit<VocabularyItem, 'id' | 'createdAt'>): Promise<VocabularyItem> => {
     const newItem: VocabularyItem = {
       ...item,

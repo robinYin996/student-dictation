@@ -3,6 +3,7 @@ export type DictationType = 'english' | 'poetry' | 'chinese'
 export interface VocabularyItem {
   id: string
   type: DictationType
+  unit: string
   content: string
   pronunciation?: string
   translation?: string

@@ -2,21 +2,6 @@ import { vocabularyStorage } from '../services/storage'
 import sampleData from '../data/sample-data'
 
 export const initializeSampleData = async () => {
-  // 检查是否已有数据
-  const existingData = await vocabularyStorage.getAll()
-  
-  if (existingData.length === 0) {
-    console.log('正在初始化示例数据...')
-    
-    // 添加示例数据
-    await vocabularyStorage.addBatch(sampleData)
-    
-    console.log('✅ 示例数据初始化完成！')
-    console.log('📊 已添加:')
-    console.log('- 英文单词: 5个')
-    console.log('- 古诗词: 5首')
-    console.log('- 汉字词语: 5个')
-  } else {
-    console.log('💡 数据库中已有数据，跳过示例数据初始化')
-  }
+  // 禁用自动加载示例数据，由用户自行创建单元和添加词条
+  console.log('💡 示例数据已禁用，请通过词库管理添加数据')
 }
