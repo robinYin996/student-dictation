@@ -243,143 +243,143 @@
     "unit": "第一单元",
     "content": "job",
     "translation": "工作；职业",
-    "id": "o60s0ptbg",
-    "createdAt": "2026-02-28T09:31:58.194Z"
+    "id": "7z3qymu0k",
+    "createdAt": "2026-02-28T09:53:31.454Z"
   },
   {
     "type": "english",
     "unit": "第一单元",
     "content": "doctor",
     "translation": "医生",
-    "id": "jqwlky58y",
-    "createdAt": "2026-02-28T09:31:58.194Z"
+    "id": "z9ms571n7",
+    "createdAt": "2026-02-28T09:53:31.454Z"
   },
   {
     "type": "english",
     "unit": "第一单元",
     "content": "farmer",
     "translation": "农场主；农民",
-    "id": "7v73i0qik",
-    "createdAt": "2026-02-28T09:31:58.194Z"
+    "id": "wx5hjvoy1",
+    "createdAt": "2026-02-28T09:53:31.454Z"
   },
   {
     "type": "english",
     "unit": "第一单元",
     "content": "nurse",
     "translation": "护士",
-    "id": "f8hdvr940",
-    "createdAt": "2026-02-28T09:31:58.194Z"
+    "id": "127widmqz",
+    "createdAt": "2026-02-28T09:53:31.454Z"
   },
   {
     "type": "english",
     "unit": "第一单元",
-    "content": "office",
-    "translation": "worker 公司职员",
-    "id": "15ur70rx2",
-    "createdAt": "2026-02-28T09:31:58.194Z"
+    "content": "office worker",
+    "translation": "公司职员",
+    "id": "vfwsldq7o",
+    "createdAt": "2026-02-28T09:53:31.454Z"
   },
   {
     "type": "english",
     "unit": "第一单元",
-    "content": "factory",
-    "translation": "worker 工厂工人",
-    "id": "nc33ztxq7",
-    "createdAt": "2026-02-28T09:31:58.194Z"
+    "content": "factory worker",
+    "translation": "工厂工人",
+    "id": "sl5tbamwp",
+    "createdAt": "2026-02-28T09:53:31.454Z"
   },
   {
     "type": "english",
     "unit": "第一单元",
     "content": "busy",
     "translation": "忙碌的",
-    "id": "38jjg73gn",
-    "createdAt": "2026-02-28T09:31:58.194Z"
+    "id": "nqz33488k",
+    "createdAt": "2026-02-28T09:53:31.454Z"
   },
   {
     "type": "english",
     "unit": "第一单元",
     "content": "tired",
     "translation": "疲倦的",
-    "id": "44x1bxzn9",
-    "createdAt": "2026-02-28T09:31:58.194Z"
+    "id": "89cwc0hr5",
+    "createdAt": "2026-02-28T09:53:31.454Z"
   },
   {
     "type": "english",
     "unit": "第一单元",
     "content": "chore",
     "translation": "家庭杂务",
-    "id": "1mv5h4nlq",
-    "createdAt": "2026-02-28T09:31:58.194Z"
+    "id": "802bupax3",
+    "createdAt": "2026-02-28T09:53:31.454Z"
   },
   {
     "type": "english",
     "unit": "第一单元",
     "content": "cook",
     "translation": "烹饪；煮",
-    "id": "s6jl96tte",
-    "createdAt": "2026-02-28T09:31:58.194Z"
+    "id": "i1l0tqxpq",
+    "createdAt": "2026-02-28T09:53:31.454Z"
   },
   {
     "type": "english",
     "unit": "第一单元",
     "content": "clean",
     "translation": "打扫；干净的",
-    "id": "qvsk1r99r",
-    "createdAt": "2026-02-28T09:31:58.194Z"
+    "id": "gtsh2alpc",
+    "createdAt": "2026-02-28T09:53:31.454Z"
   },
   {
     "type": "english",
     "unit": "第一单元",
     "content": "room",
     "translation": "房间",
-    "id": "feiogmbz8",
-    "createdAt": "2026-02-28T09:31:58.194Z"
+    "id": "145avel8q",
+    "createdAt": "2026-02-28T09:53:31.454Z"
   },
   {
     "type": "english",
     "unit": "第一单元",
-    "content": "look",
-    "translation": "after 照顾",
-    "id": "so78f2xkf",
-    "createdAt": "2026-02-28T09:31:58.194Z"
+    "content": "look after",
+    "translation": "照顾",
+    "id": "gi9hu3bqq",
+    "createdAt": "2026-02-28T09:53:31.454Z"
   },
   {
     "type": "english",
     "unit": "第一单元",
     "content": "sweep",
     "translation": "扫",
-    "id": "9ofnqbfrr",
-    "createdAt": "2026-02-28T09:31:58.194Z"
+    "id": "lxdwf88jn",
+    "createdAt": "2026-02-28T09:53:31.454Z"
   },
   {
     "type": "english",
     "unit": "第一单元",
     "content": "floor",
     "translation": "地板；地面",
-    "id": "s4jv41rok",
-    "createdAt": "2026-02-28T09:31:58.194Z"
+    "id": "6hcxu8a2y",
+    "createdAt": "2026-02-28T09:53:31.454Z"
   },
   {
     "type": "english",
     "unit": "第一单元",
     "content": "together",
     "translation": "在一起；共同",
-    "id": "tdsmg53kd",
-    "createdAt": "2026-02-28T09:31:58.194Z"
+    "id": "em1n94ckw",
+    "createdAt": "2026-02-28T09:53:31.454Z"
   },
   {
     "type": "english",
     "unit": "第一单元",
     "content": "people",
     "translation": "人；人们",
-    "id": "ab1f0co58",
-    "createdAt": "2026-02-28T09:31:58.194Z"
+    "id": "e9li9o2d8",
+    "createdAt": "2026-02-28T09:53:31.454Z"
   },
   {
     "type": "english",
     "unit": "第一单元",
     "content": "child",
     "translation": "儿童；小孩（复数：children）",
-    "id": "9oyw23026",
-    "createdAt": "2026-02-28T09:31:58.194Z"
+    "id": "in1ixsmyy",
+    "createdAt": "2026-02-28T09:53:31.454Z"
   }
 ]

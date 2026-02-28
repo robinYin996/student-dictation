@@ -104,13 +104,25 @@ const VocabularyManager: React.FC<Props> = ({ onStartDictation }) => {
       const lines = bulkImportText.split('\n').filter(line => line.trim())
       const newItems = lines.map(line => {
         if (selectedType === 'english') {
-          const parts = line.trim().split(/\s+/)
+          // 用第一个中文字符的位置来分割英文和中文
+          const chineseMatch = line.trim().match(/[\u4e00-\u9fa5]/)
+          if (chineseMatch && chineseMatch.index) {
+            const content = line.trim().substring(0, chineseMatch.index).trim()
+            const translation = line.trim().substring(chineseMatch.index).trim()
+            return {
+              type: selectedType,
+              unit: selectedUnit,
+              content: content,
+              pronunciation: undefined,
+              translation: translation || undefined
+            }
+          }
           return {
             type: selectedType,
             unit: selectedUnit,
-            content: parts[0] || '',
+            content: line.trim(),
             pronunciation: undefined,
-            translation: parts.slice(1).join(' ') || undefined
+            translation: undefined
           }
         } else {
           const parts = line.split('|').map(part => part.trim())
