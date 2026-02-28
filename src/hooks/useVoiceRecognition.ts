@@ -38,6 +38,10 @@ const useVoiceRecognition = (): VoiceRecognitionHook => {
   const [isListening, setIsListening] = useState(false)
   const [transcript, setTranscript] = useState('')
   const recognitionRef = useRef<any>(null)
+  // 控制是否应该自动重启语音识别
+  const shouldAutoRestartRef = useRef(false)
+  // 使用 ref 跟踪实际的监听状态，避免闭包问题
+  const isListeningRef = useRef(false)
 
   useEffect(() => {
     // 检查浏览器是否支持语音识别
@@ -71,11 +75,17 @@ const useVoiceRecognition = (): VoiceRecognitionHook => {
 
     recognitionRef.current.onend = () => {
       setIsListening(false)
-      // 语音识别结束后自动重新开始
-      if (recognitionRef.current) {
+      isListeningRef.current = false
+      // 只有在 shouldAutoRestart 为 true 时才自动重新开始
+      if (shouldAutoRestartRef.current && recognitionRef.current) {
         setTimeout(() => {
-          recognitionRef.current?.start()
-          setIsListening(true)
+          try {
+            recognitionRef.current?.start()
+            setIsListening(true)
+            isListeningRef.current = true
+          } catch (e) {
+            console.error('重启语音识别失败:', e)
+          }
         }, 100)
       }
     }
@@ -88,16 +98,28 @@ const useVoiceRecognition = (): VoiceRecognitionHook => {
   }, [])
 
   const startListening = () => {
-    if (recognitionRef.current && !isListening) {
-      recognitionRef.current.start()
-      setIsListening(true)
+    shouldAutoRestartRef.current = true
+    if (recognitionRef.current && !isListeningRef.current) {
+      try {
+        recognitionRef.current.start()
+        setIsListening(true)
+        isListeningRef.current = true
+      } catch (e) {
+        console.error('启动语音识别失败:', e)
+      }
     }
   }
 
   const stopListening = () => {
-    if (recognitionRef.current && isListening) {
-      recognitionRef.current.stop()
+    shouldAutoRestartRef.current = false
+    if (recognitionRef.current) {
+      try {
+        recognitionRef.current.stop()
+      } catch (e) {
+        // 忽略停止时的错误
+      }
       setIsListening(false)
+      isListeningRef.current = false
     }
   }
 

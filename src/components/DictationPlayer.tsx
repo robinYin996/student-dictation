@@ -22,7 +22,10 @@ const DictationPlayer: React.FC<Props> = ({ type, items, onBack }) => {
   const [waitingForCommand, setWaitingForCommand] = useState(false)
   const [currentPlayCount, setCurrentPlayCount] = useState(0) // 当前单词已播放次数
   
-  const { isListening, transcript, startListening, stopListening, resetTranscript, restartListening } = useVoiceRecognition()
+  const { isListening, transcript, startListening, stopListening, resetTranscript } = useVoiceRecognition()
+  
+  // 用于在 TTS 播放期间暂停语音识别
+  const isSpeakingRef = useRef(false)
 
   // Fisher-Yates 洗牌算法
   const shuffleArray = <T,>(array: T[]): T[] => {
@@ -48,6 +51,12 @@ const DictationPlayer: React.FC<Props> = ({ type, items, onBack }) => {
   // 基础文字转语音功能（只播放单段文字）
   const speakSingleText = (text: string, onEnd?: () => void) => {
     if ('speechSynthesis' in window) {
+      // TTS 播放期间暂停语音识别，防止干扰
+      isSpeakingRef.current = true
+      if (isListening) {
+        stopListening()
+      }
+      
       const utterance = new SpeechSynthesisUtterance(text)
       utterance.rate = 0.7
       utterance.pitch = 1
@@ -75,6 +84,12 @@ const DictationPlayer: React.FC<Props> = ({ type, items, onBack }) => {
   const speakText = (text: string, shouldWaitForCommand: boolean = true) => {
     if ('speechSynthesis' in window) {
       console.log('开始播放语音:', text)
+      
+      // TTS 播放期间暂停语音识别，防止干扰
+      isSpeakingRef.current = true
+      if (isListening) {
+        stopListening()
+      }
       
       // 停止之前的语音
       window.speechSynthesis.cancel()
@@ -106,6 +121,10 @@ const DictationPlayer: React.FC<Props> = ({ type, items, onBack }) => {
         console.log('语音播放完成:', text)
         console.log('当前播放次数:', currentPlayCount)
         console.log('是否等待指令:', shouldWaitForCommand)
+        
+        // TTS 播放完成，标记为不在播放
+        isSpeakingRef.current = false
+        
         // 更新播放次数
         setCurrentPlayCount(prev => {
           const newCount = prev + 1
@@ -115,11 +134,16 @@ const DictationPlayer: React.FC<Props> = ({ type, items, onBack }) => {
         // 只有当shouldWaitForCommand为true时才设置等待状态
         if (shouldWaitForCommand) {
           setWaitingForCommand(true)
+          // 监听模式下，播放完成后恢复语音识别
+          setTimeout(() => {
+            startListening()
+          }, 200)
         }
       }
       
       utterance.onerror = (error) => {
         console.error('语音播放错误:', error)
+        isSpeakingRef.current = false
       }
       
       window.speechSynthesis.speak(utterance)
