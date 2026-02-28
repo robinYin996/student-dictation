@@ -13,10 +13,10 @@ const DictationPlayer: React.FC<Props> = ({ type, items, onBack }) => {
   const [isPlaying, setIsPlaying] = useState(false)
   const [shuffledItems, setShuffledItems] = useState<VocabularyItem[]>([]) // 随机打乱后的播放列表
   const [settings, setSettings] = useState<DictationSettings>({
-    interval: 3,
+    interval: 6,
     repeatCount: 2,
     autoPlay: false, // 默认关闭自动播放
-    autoRepeatInListenMode: false // 默认关闭监听模式自动重复
+    autoRepeatInListenMode: false
   })
   const [isPaused, setIsPaused] = useState(false)
   const [waitingForCommand, setWaitingForCommand] = useState(false)
@@ -56,7 +56,7 @@ const DictationPlayer: React.FC<Props> = ({ type, items, onBack }) => {
       const utterance = new SpeechSynthesisUtterance(text)
       
       // 设置语音参数
-      utterance.rate = 0.7 // 稍慢的语速
+      utterance.rate = 0.5 // 稍慢的语速
       utterance.pitch = 1
       utterance.volume = 1
       
@@ -256,6 +256,11 @@ const DictationPlayer: React.FC<Props> = ({ type, items, onBack }) => {
       }, 1000);
       return () => clearTimeout(timer);
     }
+
+    // currentPlayCount = 0 表示首次语音正在播放中，等待 onend 回调递增
+    if (currentPlayCount === 0) {
+      return;
+    }
     
     if (currentPlayCount < settings.repeatCount) {
       // 重复播放当前单词（固定间隔 2 秒）
@@ -367,7 +372,7 @@ const DictationPlayer: React.FC<Props> = ({ type, items, onBack }) => {
         </div>
 
         {/* 设置面板 */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 bg-gray-50 rounded-lg">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               播放间隔 (秒)
@@ -375,24 +380,9 @@ const DictationPlayer: React.FC<Props> = ({ type, items, onBack }) => {
             <input
               type="number"
               min="1"
-              max="10"
+              max="30"
               value={settings.interval}
               onChange={(e) => setSettings({...settings, interval: parseInt(e.target.value)})}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              disabled={isPlaying}
-            />
-          </div>
-          
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              重复次数
-            </label>
-            <input
-              type="number"
-              min="1"
-              max="5"
-              value={settings.repeatCount}
-              onChange={(e) => setSettings({...settings, repeatCount: parseInt(e.target.value)})}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               disabled={isPlaying}
             />
@@ -408,19 +398,6 @@ const DictationPlayer: React.FC<Props> = ({ type, items, onBack }) => {
                 disabled={isPlaying}
               />
               <span className="text-sm font-medium text-gray-700">自动播放</span>
-            </label>
-          </div>
-          
-          <div className="flex items-end">
-            <label className="flex items-center">
-              <input
-                type="checkbox"
-                checked={settings.autoRepeatInListenMode}
-                onChange={(e) => setSettings({...settings, autoRepeatInListenMode: e.target.checked})}
-                className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                disabled={isPlaying}
-              />
-              <span className="text-sm font-medium text-gray-700">监听模式重复</span>
             </label>
           </div>
         </div>
