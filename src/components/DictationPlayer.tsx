@@ -1,0 +1,373 @@
+import React, { useState, useEffect, useRef } from 'react'
+import { VocabularyItem, DictationType, DictationSettings } from '../types'
+import useVoiceRecognition from '../hooks/useVoiceRecognition'
+
+interface Props {
+  type: DictationType
+  items: VocabularyItem[]
+  onBack: () => void
+}
+
+const DictationPlayer: React.FC<Props> = ({ type, items, onBack }) => {
+  const [currentIndex, setCurrentIndex] = useState(0)
+  const [isPlaying, setIsPlaying] = useState(false)
+  const [settings, setSettings] = useState<DictationSettings>({
+    interval: 3,
+    repeatCount: 2,
+    autoPlay: false // 默认关闭自动播放
+  })
+  const [isPaused, setIsPaused] = useState(false)
+  const [waitingForCommand, setWaitingForCommand] = useState(false)
+  
+  const { isListening, transcript, startListening, stopListening, resetTranscript } = useVoiceRecognition()
+
+  // 当前播放的项目
+  const currentItem = items[currentIndex]
+
+  // 文字转语音功能
+  const speakText = (text: string, shouldWaitForCommand: boolean = true) => {
+    if ('speechSynthesis' in window) {
+      console.log('开始播放语音:', text)
+      
+      // 停止之前的语音
+      window.speechSynthesis.cancel()
+      
+      const utterance = new SpeechSynthesisUtterance(text)
+      
+      // 设置语音参数
+      utterance.rate = 0.7 // 稍慢的语速
+      utterance.pitch = 1
+      utterance.volume = 1
+      
+      // 获取并选择中文语音
+      const voices = window.speechSynthesis.getVoices()
+      console.log('可用语音:', voices.map(v => v.name))
+      
+      const chineseVoice = voices.find(voice => 
+        voice.lang.startsWith('zh') || 
+        voice.name.includes('Chinese') ||
+        voice.name.includes('普通话')
+      )
+      
+      if (chineseVoice) {
+        utterance.voice = chineseVoice
+        console.log('使用语音:', chineseVoice.name)
+      }
+      
+      // 播放完成后的回调
+      utterance.onend = () => {
+        console.log('语音播放完成')
+        // 只有当shouldWaitForCommand为true时才设置等待状态
+        if (shouldWaitForCommand) {
+          setWaitingForCommand(true)
+        }
+      }
+      
+      utterance.onerror = (error) => {
+        console.error('语音播放错误:', error)
+      }
+      
+      window.speechSynthesis.speak(utterance)
+    }
+  }
+
+  // 播放下一个项目
+  const playNext = () => {
+    console.log('播放下一个项目')
+    if (currentIndex < items.length - 1) {
+      setCurrentIndex(prev => prev + 1)
+      setWaitingForCommand(false)
+      // 延迟播放，让用户有准备时间
+      setTimeout(() => {
+        speakText(items[currentIndex + 1].content, true) // 播放完成后等待指令
+      }, 800)
+    } else {
+      // 默写完成
+      setIsPlaying(false)
+      setWaitingForCommand(false)
+      alert('🎉 默写完成！')
+    }
+  }
+
+  // 重复播放当前项目
+  const repeatCurrent = () => {
+    console.log('重复播放当前项目')
+    if (currentItem) {
+      setWaitingForCommand(false)
+      speakText(currentItem.content, true) // 重复播放后也等待指令
+    }
+  }
+
+  // 开始默写
+  const startDictation = () => {
+    if (items.length === 0) return
+    
+    console.log('开始默写')
+    setIsPlaying(true)
+    setCurrentIndex(0)
+    setWaitingForCommand(false)
+    
+    // 开始语音识别
+    startListening()
+    
+    // 播放第一个项目
+    setTimeout(() => {
+      speakText(items[0].content, true) // 第一次播放后也要等待指令
+    }, 1000)
+  }
+
+  // 暂停/继续
+  const togglePause = () => {
+    if (isPaused) {
+      setIsPaused(false)
+      if (isPlaying && currentItem) {
+        speakText(currentItem.content, false) // 暂停后继续播放不等待指令
+      }
+    } else {
+      setIsPaused(true)
+      window.speechSynthesis.cancel()
+    }
+  }
+
+  // 停止默写
+  const stopDictation = () => {
+    console.log('停止默写')
+    setIsPlaying(false)
+    setIsPaused(false)
+    setWaitingForCommand(false)
+    setCurrentIndex(0)
+    stopListening()
+    window.speechSynthesis.cancel()
+    resetTranscript()
+  }
+
+  // 处理语音命令
+  useEffect(() => {
+    if (!transcript.trim()) return
+    
+    const lowerTranscript = transcript.toLowerCase().trim()
+    console.log('识别到语音命令:', transcript)
+    
+    // 下一个命令
+    if (lowerTranscript.includes('下一个') || 
+        lowerTranscript.includes('next') || 
+        lowerTranscript.includes('下一页') ||
+        lowerTranscript.includes('继续')) {
+      if (isPlaying && !isPaused && waitingForCommand) {
+        console.log('执行"下一个"命令')
+        playNext()
+        resetTranscript()
+      }
+    }
+    // 重复播放命令
+    else if (lowerTranscript.includes('重复') || 
+             lowerTranscript.includes('再来一遍') ||
+             lowerTranscript.includes('repeat')) {
+      if (isPlaying && !isPaused && waitingForCommand) {
+        console.log('执行"重复"命令')
+        repeatCurrent()
+        resetTranscript()
+      }
+    }
+  }, [transcript, isPlaying, isPaused, waitingForCommand])
+
+  const getTypeLabel = (type: DictationType) => {
+    switch (type) {
+      case 'english': return '英文单词'
+      case 'poetry': return '古诗词'
+      case 'chinese': return '汉字词语'
+    }
+  }
+
+  return (
+    <div className="max-w-4xl mx-auto">
+      {/* 控制面板 */}
+      <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
+        <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
+          <h2 className="text-2xl font-bold text-gray-800">
+            {getTypeLabel(type)}默写
+          </h2>
+          
+          <div className="flex items-center gap-4">
+            <div className="text-sm text-gray-600">
+              进度: {currentIndex + 1}/{items.length}
+            </div>
+            <div className="w-32 bg-gray-200 rounded-full h-2">
+              <div 
+                className="bg-blue-500 h-2 rounded-full transition-all duration-300"
+                style={{ width: `${((currentIndex + 1) / items.length) * 100}%` }}
+              ></div>
+            </div>
+          </div>
+        </div>
+
+        {/* 播放控制按钮 */}
+        <div className="flex flex-wrap justify-center gap-4 mb-6">
+          {!isPlaying ? (
+            <button
+              onClick={startDictation}
+              className="px-8 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors text-lg font-semibold"
+            >
+              ▶️ 开始默写
+            </button>
+          ) : (
+            <>
+              <button
+                onClick={togglePause}
+                className="px-6 py-3 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors"
+              >
+                {isPaused ? '▶️ 继续' : '⏸️ 暂停'}
+              </button>
+              <button
+                onClick={stopDictation}
+                className="px-6 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+              >
+                ⏹️ 停止
+              </button>
+              {waitingForCommand && (
+                <button
+                  onClick={playNext}
+                  className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                >
+                  🔊 播放下一个
+                </button>
+              )}
+            </>
+          )}
+        </div>
+
+        {/* 设置面板 */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-gray-50 rounded-lg">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              播放间隔 (秒)
+            </label>
+            <input
+              type="number"
+              min="1"
+              max="10"
+              value={settings.interval}
+              onChange={(e) => setSettings({...settings, interval: parseInt(e.target.value)})}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              disabled={isPlaying}
+            />
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              重复次数
+            </label>
+            <input
+              type="number"
+              min="1"
+              max="5"
+              value={settings.repeatCount}
+              onChange={(e) => setSettings({...settings, repeatCount: parseInt(e.target.value)})}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              disabled={isPlaying}
+            />
+          </div>
+          
+          <div className="flex items-end">
+            <label className="flex items-center">
+              <input
+                type="checkbox"
+                checked={settings.autoPlay}
+                onChange={(e) => setSettings({...settings, autoPlay: e.target.checked})}
+                className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                disabled={isPlaying}
+              />
+              <span className="text-sm font-medium text-gray-700">自动播放</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      {/* 当前播放内容显示 */}
+      {isPlaying && currentItem && (
+        <div className="bg-white rounded-lg shadow-lg p-8 mb-6 text-center">
+          <div className="mb-6">
+            <div className="text-4xl font-bold text-gray-800 mb-2">
+              {currentItem.content}
+            </div>
+            {currentItem.pronunciation && (
+              <div className="text-xl text-gray-600 mb-2">
+                {currentItem.pronunciation}
+              </div>
+            )}
+            {currentItem.translation && (
+              <div className="text-lg text-gray-500">
+                {currentItem.translation}
+              </div>
+            )}
+          </div>
+          
+          <div className={`text-lg ${
+            waitingForCommand ? 'text-green-600' : 'text-gray-600'
+          }`}>
+            {waitingForCommand ? '🎤 等待语音指令...' : '🔊 正在播放...'}
+          </div>
+        </div>
+      )}
+
+      {/* 语音识别显示 */}
+      <div className="bg-white rounded-lg shadow-lg p-6">
+        <h3 className="text-lg font-semibold mb-4">语音识别</h3>
+        <div className={`p-4 rounded-lg mb-4 ${
+          isListening ? 'bg-green-50 border border-green-200' : 'bg-gray-50'
+        }`}>
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm font-medium text-gray-700">
+              {isListening ? '🎤 正在监听...' : '🔇 已停止监听'}
+            </span>
+            <span className="text-xs text-gray-500">
+              说出"下一个"或"重复"
+            </span>
+          </div>
+          <div className="text-gray-800 min-h-[2rem]">
+            {transcript || '等待语音输入...'}
+          </div>
+          <div className="text-xs text-gray-500 mt-2">
+            状态: {waitingForCommand ? '等待指令' : '播放中'}
+          </div>
+        </div>
+        
+        <div className="flex gap-2">
+          {!isListening ? (
+            <button
+              onClick={startListening}
+              className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+            >
+              开始监听
+            </button>
+          ) : (
+            <button
+              onClick={stopListening}
+              className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+            >
+              停止监听
+            </button>
+          )}
+          <button
+            onClick={resetTranscript}
+            className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
+          >
+            清空文本
+          </button>
+        </div>
+      </div>
+
+      {/* 返回按钮 */}
+      <div className="mt-8 text-center">
+        <button
+          onClick={onBack}
+          className="px-6 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
+        >
+          ← 返回词库管理
+        </button>
+      </div>
+    </div>
+  )
+}
+
+export default DictationPlayer
