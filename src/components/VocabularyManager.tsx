@@ -124,7 +124,27 @@ const VocabularyManager: React.FC<Props> = ({ onStartDictation }) => {
             pronunciation: undefined,
             translation: undefined
           }
+        } else if (selectedType === 'chinese') {
+          // 汉字词语用冒号分隔：成语：解释
+          const colonIndex = line.indexOf('：') !== -1 ? line.indexOf('：') : line.indexOf(':')
+          if (colonIndex !== -1) {
+            return {
+              type: selectedType,
+              unit: selectedUnit,
+              content: line.substring(0, colonIndex).trim(),
+              pronunciation: undefined,
+              translation: line.substring(colonIndex + 1).trim() || undefined
+            }
+          }
+          return {
+            type: selectedType,
+            unit: selectedUnit,
+            content: line.trim(),
+            pronunciation: undefined,
+            translation: undefined
+          }
         } else {
+          // 古诗词用 | 分隔
           const parts = line.split('|').map(part => part.trim())
           return {
             type: selectedType,
@@ -400,6 +420,8 @@ const VocabularyManager: React.FC<Props> = ({ onStartDictation }) => {
             <label className="block text-sm font-medium text-gray-700 mb-2">
               {selectedType === 'english' 
                 ? '格式说明：每行一个单词，英文和中文翻译用空格分隔' 
+                : selectedType === 'chinese'
+                ? '格式说明：每行一个词语，词语和解释用冒号分隔'
                 : '格式说明：每行一个项目，用 | 分隔内容、发音、翻译'
               }
             </label>
@@ -411,12 +433,16 @@ const VocabularyManager: React.FC<Props> = ({ onStartDictation }) => {
               placeholder={selectedType === 'english' 
                 ? `示例格式：
 apple 苹果
-banana 香蕉
-orange 橙子`
+factory worker 工厂工人
+ice cream 冰淇淋`
+                : selectedType === 'chinese'
+                ? `示例格式：
+守株待兔：比喻不想努力，而希望通过侥幸获得成功。
+掩耳盗铃：比喻自己欺骗自己。
+画蛇添足：比喻做了多余的事。`
                 : `示例格式：
-apple|/ˈæpəl/|苹果
-banana|/bəˈnænə/|香蕉
-orange|/ˈɒrɪndʒ/|橙子`
+静夜思|李白|床前明月光，疑是地上霜。
+春晓|孟浩然|春眠不觉晓，处处闻啼鸟。`
               }
             />
           </div>
