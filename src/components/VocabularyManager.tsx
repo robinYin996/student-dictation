@@ -49,12 +49,24 @@ const VocabularyManager: React.FC<Props> = ({ onStartDictation }) => {
     try {
       const lines = bulkImportText.split('\n').filter(line => line.trim())
       const newItems = lines.map(line => {
-        const parts = line.split('|').map(part => part.trim())
-        return {
-          type: selectedType,
-          content: parts[0],
-          pronunciation: parts[1] || undefined,
-          translation: parts[2] || undefined
+        // 对于英文单词类型，支持空格分隔格式
+        if (selectedType === 'english') {
+          const parts = line.trim().split(/\s+/) // 使用正则表达式按空格分割
+          return {
+            type: selectedType,
+            content: parts[0] || '',
+            pronunciation: undefined, // 英文单词不需要发音字段
+            translation: parts.slice(1).join(' ') || undefined // 剩余部分作为翻译
+          }
+        } else {
+          // 其他类型保持原有逻辑
+          const parts = line.split('|').map(part => part.trim())
+          return {
+            type: selectedType,
+            content: parts[0],
+            pronunciation: parts[1] || undefined,
+            translation: parts[2] || undefined
+          }
         }
       })
 
@@ -241,17 +253,26 @@ const VocabularyManager: React.FC<Props> = ({ onStartDictation }) => {
         <h3 className="text-lg font-medium mb-4">批量导入</h3>
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            格式说明：每行一个项目，用 | 分隔内容、发音、翻译
+            {selectedType === 'english' 
+              ? '格式说明：每行一个单词，英文和中文翻译用空格分隔' 
+              : '格式说明：每行一个项目，用 | 分隔内容、发音、翻译'
+            }
           </label>
           <textarea
             value={bulkImportText}
             onChange={(e) => setBulkImportText(e.target.value)}
             rows={6}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder={`示例格式：
+            placeholder={selectedType === 'english' 
+              ? `示例格式：
+apple 苹果
+banana 香蕉
+orange 橙子`
+              : `示例格式：
 apple|/ˈæpəl/|苹果
 banana|/bəˈnænə/|香蕉
-orange|/ˈɒrɪndʒ/|橙子`}
+orange|/ˈɒrɪndʒ/|橙子`
+            }
           />
         </div>
         <button
